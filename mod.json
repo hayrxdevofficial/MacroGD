@@ -8,7 +8,7 @@
   },
   "id": "hayrxdev.macrogd",
   "name": "MacroGD",
-  "version": "v0.1.0",
+  "version": "v0.2.0",
   "developer": "HayrX_Dev",
-  "description": "Frame-based input recorder with experimental GDR2 export."
+  "description": "Frame-based input recorder with GDR2 replay recording and export."
 }
