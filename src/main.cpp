@@ -5,6 +5,7 @@
 #include "gdr2.hpp"
 #include <algorithm>
 #include <cstdint>
+#include <fstream>
 #include <string>
 
 using namespace geode::prelude;
