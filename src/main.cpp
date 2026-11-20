@@ -15,8 +15,9 @@ public:
  void begin() { m_data = ReplayData{}; m_frame = 0; m_recording = true; }
  void tick() { if (m_recording) ++m_frame; }
  void input(bool down, int button, bool player2) {
-  if (!m_recording || button < 1 || button > 3) return;
-  m_data.inputs.push_back(InputEvent{m_frame, static_cast<std::uint8_t>(button), player2, down});
+  // Classic GDR2 inputs represent the jump button; platformer buttons need a separate encoding.
+  if (!m_recording || button != 1) return;
+  m_data.inputs.push_back(InputEvent{m_frame, 1, player2, down});
  }
  bool isRecording() const { return m_recording; }
  void finish(PlayLayer* layer) {
@@ -41,7 +42,7 @@ private:
   if (ec) { log::error("MacroGD: cannot create save folder: {}", ec.message()); return; }
   auto name = m_data.levelName.empty() ? std::string("macro") : m_data.levelName;
   for (auto& ch : name) {
-   if (ch == '/' || ch == '\\\\' || ch == ':' || ch == '*' || ch == '?' || ch == '"' || ch == '<' || ch == '>' || ch == '|') ch = '_';
+   if (ch == '/' || ch == 92 || ch == ':' || ch == '*' || ch == '?' || ch == '"' || ch == '<' || ch == '>' || ch == '|') ch = '_';
   }
   const auto path = folder / (name + ".gdr2");
   std::ofstream file(path, std::ios::binary | std::ios::trunc);
@@ -54,11 +55,14 @@ private:
 } // namespace macrogd
 
 class $modify(MacroGDPlayLayer, PlayLayer) {
- void update(float dt) { PlayLayer::update(dt); macrogd::Recorder::get().tick(); }
  void levelComplete() { macrogd::Recorder::get().finish(this); PlayLayer::levelComplete(); }
 };
 
 class $modify(MacroGDInputLayer, GJBaseGameLayer) {
+ void processCommands(float dt, bool isHalfTick, bool isLastTick) {
+  GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
+  if (PlayLayer::get() == this && isLastTick) macrogd::Recorder::get().tick();
+ }
  void handleButton(bool down, int button, bool isPlayer1) {
   if (PlayLayer::get() == this) macrogd::Recorder::get().input(down, button, !isPlayer1);
   GJBaseGameLayer::handleButton(down, button, isPlayer1);
