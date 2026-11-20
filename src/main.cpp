@@ -112,13 +112,13 @@ class $modify(MacroGDInputLayer, GJBaseGameLayer) {
         }
     }
 
-    void handleButton(bool down, int button, bool isPlayer2) {
+    void handleButton(bool down, int button, bool isPlayer1) {
         if (PlayLayer::get() == this) {
             macrogd::Recorder::get().input(
-                m_gameState.m_commandIndex, down, button, isPlayer2
+                m_gameState.m_commandIndex, down, button, !isPlayer1
             );
         }
-        GJBaseGameLayer::handleButton(down, button, isPlayer2);
+        GJBaseGameLayer::handleButton(down, button, isPlayer1);
     }
 };
 
