@@ -33,6 +33,11 @@ public:
         m_lastFrame = std::max(m_lastFrame, frame);
     }
 
+    void tick(std::uint64_t currentCommand) {
+        if (!m_recording || currentCommand < m_startCommand) return;
+        m_lastFrame = std::max(m_lastFrame, currentCommand - m_startCommand);
+    }
+
     bool isRecording() const { return m_recording; }
 
     void finish(PlayLayer* layer) {
@@ -100,6 +105,13 @@ class $modify(MacroGDPlayLayer, PlayLayer) {
 };
 
 class $modify(MacroGDInputLayer, GJBaseGameLayer) {
+    void postUpdate(float dt) {
+        GJBaseGameLayer::postUpdate(dt);
+        if (PlayLayer::get() == this) {
+            macrogd::Recorder::get().tick(m_gameState.m_commandIndex);
+        }
+    }
+
     void handleButton(bool down, int button, bool isPlayer2) {
         if (PlayLayer::get() == this) {
             macrogd::Recorder::get().input(
