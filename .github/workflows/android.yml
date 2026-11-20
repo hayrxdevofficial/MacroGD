@@ -1,0 +1,38 @@
+name: Build MacroGD for Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "**"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Android ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [Android32, Android64]
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build Android mod
+        id: build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          target: ${{ matrix.target }}
+          combine: true
+          build-config: Release
+          android-min-sdk: 23
+
+      - name: Upload Android package
+        uses: actions/upload-artifact@v7
+        with:
+          name: MacroGD-${{ matrix.target }}
+          path: ${{ steps.build.outputs.build-output }}
+          if-no-files-found: error
