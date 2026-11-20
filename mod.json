@@ -5,7 +5,7 @@
   },
   "id": "hayrxdev.macrogd",
   "name": "MacroGD",
-  "version": "v0.2.0",
+  "version": "v0.3.0",
   "developer": "HayrX_Dev",
   "description": "Android-only GDR2 replay recorder."
 }
