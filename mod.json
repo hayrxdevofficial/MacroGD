@@ -1,0 +1,14 @@
+{
+  "geode": "$GEODE_VERSION",
+  "gd": {
+    "win": "2.2074",
+    "android": "2.2074",
+    "mac": "2.2074",
+    "ios": "2.2074"
+  },
+  "id": "hayrxdev.macrogd",
+  "name": "MacroGD",
+  "version": "v0.1.0",
+  "developer": "HayrX_Dev",
+  "description": "Frame-based input recorder with experimental GDR2 export."
+}
