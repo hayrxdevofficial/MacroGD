@@ -15,7 +15,7 @@ public:
  void begin() { m_data = ReplayData{}; m_frame = 0; m_recording = true; }
  void tick() { if (m_recording) ++m_frame; }
  void input(bool down, int button, bool player2) {
-  // Classic GDR2 inputs represent the jump button; platformer buttons need a separate encoding.
+  // Classic-mode GDR2 stores jump press/release; platformer encoding is not enabled yet.
   if (!m_recording || button != 1) return;
   m_data.inputs.push_back(InputEvent{m_frame, 1, player2, down});
  }
@@ -36,7 +36,7 @@ private:
  bool m_recording = false;
  void save() {
   const auto bytes = Writer::encode(m_data);
-  const auto folder = Mod::get()->getSaveDir();
+  const auto folder = Mod::get()->getSaveDir().string();
   std::error_code ec;
   std::filesystem::create_directories(folder, ec);
   if (ec) { log::error("MacroGD: cannot create save folder: {}", ec.message()); return; }
@@ -44,11 +44,11 @@ private:
   for (auto& ch : name) {
    if (ch == '/' || ch == 92 || ch == ':' || ch == '*' || ch == '?' || ch == '"' || ch == '<' || ch == '>' || ch == '|') ch = '_';
   }
-  const auto path = folder / (name + ".gdr2");
+  const auto path = folder + "/" + name + ".gdr2";
   std::ofstream file(path, std::ios::binary | std::ios::trunc);
-  if (!file) { log::error("MacroGD: cannot open {}", path.string()); return; }
+  if (!file) { log::error("MacroGD: cannot open {}", path); return; }
   file.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
-  if (file.good()) log::info("MacroGD: replay saved to {}", path.string());
+  if (file.good()) log::info("MacroGD: replay saved to {}", path);
   else log::error("MacroGD: writing replay failed");
  }
 };
@@ -61,7 +61,7 @@ class $modify(MacroGDPlayLayer, PlayLayer) {
 class $modify(MacroGDInputLayer, GJBaseGameLayer) {
  void processCommands(float dt, bool isHalfTick, bool isLastTick) {
   GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
-  if (PlayLayer::get() == this && isLastTick) macrogd::Recorder::get().tick();
+  if (PlayLayer::get() == this) macrogd::Recorder::get().tick();
  }
  void handleButton(bool down, int button, bool isPlayer1) {
   if (PlayLayer::get() == this) macrogd::Recorder::get().input(down, button, !isPlayer1);
