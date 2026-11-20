@@ -9,7 +9,7 @@ GitHub Actions builds two Android variants:
 - **Android32** — ARMv7 (32-bit)
 - **Android64** — ARM64 (64-bit)
 
-Open the repository's **Actions** tab and select **Build MacroGD for Android**. Each successful job uploads its own `.geode` artifact.
+Open the repository's **Actions** tab and select **Build MacroGD for Android**. After both builds succeed, the workflow combines them and uploads one `MacroGD-Android` artifact.
 
 ## Features
 
