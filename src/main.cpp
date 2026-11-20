@@ -2,6 +2,7 @@
 #include <Geode/modify/PauseLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/utils/file.hpp>
 #include "gdr2.hpp"
 #include <algorithm>
 #include <cstdint>
