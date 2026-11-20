@@ -5,7 +5,6 @@
 #include "gdr2.hpp"
 #include <algorithm>
 #include <cstdint>
-#include <filesystem>
 #include <string>
 
 using namespace geode::prelude;
@@ -62,10 +61,9 @@ private:
 
     void save() {
         auto folder = Mod::get()->getSaveDir();
-        std::error_code ec;
-        std::filesystem::create_directories(folder, ec);
-        if (ec) {
-            log::error("MacroGD: cannot create save directory: {}", ec.message());
+        auto directoryResult = utils::file::createDirectoryAll(folder);
+        if (directoryResult.isErr()) {
+            log::error("MacroGD: cannot create save directory: {}", directoryResult.unwrapErr());
             return;
         }
 
@@ -79,17 +77,28 @@ private:
         }
 
         auto path = folder / (name + ".gdr2");
-        for (unsigned int suffix = 2; std::filesystem::exists(path, ec) && !ec; ++suffix) {
+        for (unsigned int suffix = 2; asp::fs::exists(path); ++suffix) {
             path = folder / (name + "_" + std::to_string(suffix) + ".gdr2");
         }
-        if (ec) {
-            log::error("MacroGD: cannot inspect output path: {}", ec.message());
+
+        auto result = m_replay.exportData();
+        if (result.isErr()) {
+            log::error("MacroGD: GDR2 serialization failed: {}", result.unwrapErr());
             return;
         }
 
-        auto result = m_replay.exportData(path);
-        if (result.isErr()) {
-            log::error("MacroGD: GDR2 export failed: {}", result.unwrapErr());
+        auto const& bytes = result.unwrap();
+        std::ofstream file(path.string(), std::ios::binary | std::ios::trunc);
+        if (!file) {
+            log::error("MacroGD: cannot open replay file {}", path.string());
+            return;
+        }
+        file.write(
+            reinterpret_cast<char const*>(bytes.data()),
+            static_cast<std::streamsize>(bytes.size())
+        );
+        if (!file) {
+            log::error("MacroGD: failed writing replay file {}", path.string());
             return;
         }
         log::info("MacroGD: saved replay to {}", path.string());
