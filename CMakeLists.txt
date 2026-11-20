@@ -12,5 +12,5 @@ CPMAddPackage("gh:maxnut/GDReplayFormat#d8d2f0b1193a46cdf47b413dc832616dd052b6a9
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE libGDR)
+target_link_libraries(${PROJECT_NAME} libGDR)
 setup_geode_mod(${PROJECT_NAME})
